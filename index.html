@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>ASC Board - DLO2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #1a2332;
+            color: #fff;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+        }
+        .header {
+            background: #2c3e50;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            border-bottom: 3px solid #00a8e8;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .header-left img {
+            height: 80px;
+            width: 80px;
+            object-fit: contain;
+            display: block;
+        }
+        .header h1 { font-size: 30px; font-weight: 700; color: #fff; }
+        .header .subtitle { font-size: 16px; color: #00a8e8; font-weight: 500; }
+        .header .date-display { font-size: 18px; color: #00a8e8; font-weight: 600; }
+        .header .refresh-info { font-size: 12px; color: #5a7a9a; }
+
+        .main { display: flex; height: 950px; }
+
+        /* LEFT BOARD */
+        .board-section {
+            width: 65%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 15px;
+        }
+        .open-section {
+            flex: 3;
+            background: #1e3044;
+            border-radius: 12px;
+            padding: 20px;
+            overflow: hidden;
+            border: 1px solid #2a4a6b;
+        }
+        .open-section h2 {
+            font-size: 22px;
+            color: #00a8e8;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #1e3044;
+            padding-bottom: 10px;
+            position: relative;
+            z-index: 10;
+        }
+        .count-badge {
+            background: #00a8e8;
+            color: #1a2332;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .items-container {
+            overflow: hidden;
+            max-height: calc(100% - 60px);
+        }
+        .items-scroll {
+            animation: scrollUp 40s linear infinite;
+        }
+        @keyframes scrollUp {
+            0%, 40% { transform: translateY(0); }
+            50%, 90% { transform: translateY(var(--scroll-distance, 0px)); }
+            100% { transform: translateY(0); }
+        }
+        .item-row {
+            display: grid;
+            grid-template-columns: 70px 1fr 100px 80px 75px;
+            gap: 10px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #2a4a6b;
+            align-items: center;
+            font-size: 14px;
+        }
+        .item-row.header-row {
+            font-weight: 700;
+            color: #00a8e8;
+            font-size: 12px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #00a8e8;
+            position: sticky;
+            top: 0;
+            background: #1e3044;
+            z-index: 5;
+            padding-top: 5px;
+            padding-bottom: 10px;
+        }
+        .item-row .date { color: #7a9bb5; }
+        .item-row .description { color: #e6e6e6; line-height: 1.3; }
+        .item-row .owner { color: #4fc3f7; }
+        .item-row .eta { color: #ffb74d; }
+        .suggested-by { font-size: 11px; color: #5a7a9a; margin-top: 2px; }
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .status-open { background: #e74c3c22; color: #e74c3c; border: 1px solid #e74c3c; }
+        .status-wip { background: #f39c1222; color: #f39c12; border: 1px solid #f39c12; }
+        .status-blocked { background: #9b59b622; color: #9b59b6; border: 1px solid #9b59b6; }
+
+        /* CLOSED */
+        .closed-section {
+            flex: 1.5;
+            background: #0d2818;
+            border-radius: 12px;
+            padding: 20px;
+            overflow: hidden;
+            border: 1px solid #1a5c2a;
+        }
+        .closed-section h2 {
+            font-size: 20px;
+            color: #2ecc71;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0d2818;
+            padding-bottom: 10px;
+            position: relative;
+            z-index: 10;
+        }
+        .closed-section .count-badge {
+            background: #2ecc71;
+            color: #0d2818;
+        }
+        .closed-scroll {
+            animation: scrollClosed 25s linear infinite;
+        }
+        @keyframes scrollClosed {
+            0%, 40% { transform: translateY(0); }
+            50%, 90% { transform: translateY(var(--scroll-closed, 0px)); }
+            100% { transform: translateY(0); }
+        }
+        .closed-row {
+            display: grid;
+            grid-template-columns: 70px 1fr 100px 80px;
+            gap: 10px;
+            padding: 8px 12px;
+            border-bottom: 1px solid #1a5c2a;
+            font-size: 13px;
+        }
+        .closed-row.header-row {
+            font-weight: 700;
+            color: #2ecc71;
+            border-bottom: 2px solid #2ecc71;
+            position: sticky;
+            top: 0;
+            background: #0d2818;
+            z-index: 5;
+        }
+        .closed-row .description { color: #7fbc7f; }
+        .closed-row .date { color: #5a8a5a; }
+        .closed-row .owner { color: #2ecc71; }
+        .closed-row .completed { color: #5a8a5a; font-style: italic; }
+
+        /* RIGHT PHOTOS */
+        .photos-section {
+            width: 35%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .photos-section h2 { font-size: 20px; color: #00a8e8; text-align: center; }
+        .photo-carousel {
+            flex: 1;
+            background: #1e3044;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #2a4a6b;
+        }
+        .photo-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        .photo-slide.active { opacity: 1; }
+        .photo-slide img {
+            max-width: 90%;
+            max-height: 75%;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        .photo-placeholder {
+            width: 90%;
+            height: 75%;
+            background: #253d54;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5a7a9a;
+            font-size: 16px;
+            border: 2px dashed #3a5a7a;
+        }
+        .photo-caption {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #7a9bb5;
+            text-align: center;
+            padding: 0 20px;
+        }
+        .no-photos {
+            color: #5a7a9a;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            background: #0f1a26;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border-top: 2px solid #00a8e8;
+        }
+        .ticker {
+            display: flex;
+            animation: ticker 30s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .ticker span { padding: 0 50px; font-size: 14px; color: #00a8e8; }
+
+        /* LOADING */
+        .loading { color: #5a7a9a; font-size: 16px; text-align: center; padding: 40px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="logo.png" alt="DLO2 Logo">
+            <div>
+                <h1>ASC BOARD — DLO2</h1>
+                <div class="subtitle">Associate Safety Committee</div>
+            </div>
+        </div>
+        <div style="text-align:right">
+            <div class="date-display" id="currentDate"></div>
+            <div class="refresh-info" id="refreshInfo">Auto-refresh ogni 5 min</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="board-section">
+            <div class="open-section">
+                <h2>OPEN FINDINGS <span class="count-badge" id="openCount">0</span></h2>
+                <div class="items-container">
+                    <div class="item-row header-row">
+                        <span>Data</span>
+                        <span>Descrizione</span>
+                        <span>Owner</span>
+                        <span>ETA</span>
+                        <span>Status</span>
+                    </div>
+                    <div id="openItems" class="items-scroll">
+                        <div class="loading">Caricamento dati...</div>
+                    </div>
+                </div>
+            </div>
+            <div class="closed-section">
+                <h2>COMPLETED <span class="count-badge" id="closedCount">0</span></h2>
+                <div class="closed-row header-row">
+                    <span>Data</span>
+                    <span>Descrizione</span>
+                    <span>Owner</span>
+                    <span>Chiuso il</span>
+                </div>
+                <div id="closedItems" class="closed-scroll">
+                    <div class="loading">Caricamento dati...</div>
+                </div>
+            </div>
+        </div>
+        <div class="photos-section">
+            <h2>LAVORAZIONI COMPLETATE</h2>
+            <div class="photo-carousel" id="photoCarousel">
+                <div class="no-photos">Nessuna foto disponibile</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="ticker" id="ticker">
+            <span>Safety First — Nessun pacco vale piu della tua salute</span>
+            <span>Hai un finding? Segnalalo al tuo ASC representative!</span>
+        </div>
+    </div>
+
+    <script>
+        const SHEET_ID = '1VbI8PLW8a96byE0PokhiA_pjYI_AyeWyEWNUMNxIYJA';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+        const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minuti
+
+        // Update date
+        const now = new Date();
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('it-IT', {
+            weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+        });
+
+        function parseCSV(text) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+            const rows = [];
+            for (const line of lines) {
+                const cols = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    if (line[i] === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (line[i] === ',' && !inQuotes) {
+                        cols.push(current.trim());
+                        current = '';
+                    } else {
+                        current += line[i];
+                    }
+                }
+                cols.push(current.trim());
+                rows.push(cols);
+            }
+            return rows;
+        }
+
+        function getStatusClass(status) {
+            const s = (status || '').toUpperCase();
+            if (s === 'WIP' || s === 'IN PROGRESS') return 'status-wip';
+            if (s === 'BLOCKED') return 'status-blocked';
+            return 'status-open';
+        }
+
+        function renderBoard(data) {
+            // Expected columns: Data, Descrizione, Suggerito da, Owner, ETA, Status, Note, Foto URL
+            // Find header row
+            let headerIdx = -1;
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i].map(c => c.toUpperCase());
+                if (row.some(c => c.includes('DATA')) && row.some(c => c.includes('DESCRIZIONE'))) {
+                    headerIdx = i;
+                    break;
+                }
+            }
+            if (headerIdx === -1) {
+                document.getElementById('openItems').innerHTML = '<div class="loading">Struttura foglio non riconosciuta. Colonne richieste: Data, Descrizione, Suggerito da, Owner, ETA, Status, Note, Foto URL</div>';
+                return;
+            }
+
+            const headers = data[headerIdx].map(h => h.toUpperCase().trim());
+            const colIdx = {
+                data: headers.findIndex(h => h.includes('DATA')),
+                descrizione: headers.findIndex(h => h.includes('DESCRIZIONE')),
+                suggerito: headers.findIndex(h => h.includes('SUGGERITO')),
+                owner: headers.findIndex(h => h.includes('OWNER')),
+                eta: headers.findIndex(h => h.includes('ETA')),
+                status: headers.findIndex(h => h.includes('STATUS')),
+                note: headers.findIndex(h => h.includes('NOTE')),
+                foto: headers.findIndex(h => h.includes('FOTO')),
+                chiuso: headers.findIndex(h => h.includes('CHIUSO')),
+            };
+
+            const items = [];
+            for (let i = headerIdx + 1; i < data.length; i++) {
+                const row = data[i];
+                const descrizione = row[colIdx.descrizione] || '';
+                if (!descrizione) continue;
+                items.push({
+                    data: row[colIdx.data] || '',
+                    descrizione: descrizione,
+                    suggerito: colIdx.suggerito >= 0 ? (row[colIdx.suggerito] || '') : '',
+                    owner: row[colIdx.owner] || '',
+                    eta: colIdx.eta >= 0 ? (row[colIdx.eta] || '') : '',
+                    status: row[colIdx.status] || 'OPEN',
+                    note: colIdx.note >= 0 ? (row[colIdx.note] || '') : '',
+                    foto: colIdx.foto >= 0 ? (row[colIdx.foto] || '') : '',
+                    chiuso: colIdx.chiuso >= 0 ? (row[colIdx.chiuso] || '') : '',
+                });
+            }
+
+            const openItems = items.filter(i => i.status.toUpperCase() !== 'DONE' && i.status.toUpperCase() !== 'COMPLETED');
+            const closedItems = items.filter(i => i.status.toUpperCase() === 'DONE' || i.status.toUpperCase() === 'COMPLETED');
+
+            // Render open
+            document.getElementById('openCount').textContent = openItems.length;
+            let openHTML = '';
+            for (const item of openItems) {
+                const suggestedLine = item.suggerito ? `<br><span class="suggested-by">Suggerito da: ${item.suggerito}</span>` : '';
+                openHTML += `
+                    <div class="item-row">
+                        <span class="date">${item.data}</span>
+                        <span class="description">${item.descrizione}${suggestedLine}</span>
+                        <span class="owner">${item.owner}</span>
+                        <span class="eta">${item.eta}</span>
+                        <span class="status-badge ${getStatusClass(item.status)}">${item.status.toUpperCase()}</span>
+                    </div>`;
+            }
+            document.getElementById('openItems').innerHTML = openHTML || '<div class="loading">Nessun finding aperto</div>';
+
+            // Render closed
+            document.getElementById('closedCount').textContent = closedItems.length;
+            let closedHTML = '';
+            for (const item of closedItems) {
+                closedHTML += `
+                    <div class="closed-row">
+                        <span class="date">${item.data}</span>
+                        <span class="description">${item.descrizione}</span>
+                        <span class="owner">${item.owner}</span>
+                        <span class="completed">${item.chiuso || item.eta || ''}</span>
+                    </div>`;
+            }
+            document.getElementById('closedItems').innerHTML = closedHTML || '<div class="loading">Nessun finding completato</div>';
+
+            // Render photos
+            const photos = closedItems.filter(i => i.foto);
+            const carousel = document.getElementById('photoCarousel');
+            if (photos.length > 0) {
+                let photoHTML = '';
+                photos.forEach((p, idx) => {
+                    photoHTML += `
+                        <div class="photo-slide ${idx === 0 ? 'active' : ''}">
+                            <img src="${p.foto}" alt="${p.descrizione}" onerror="this.parentElement.innerHTML='<div class=\\'photo-placeholder\\'>Immagine non disponibile</div><div class=\\'photo-caption\\'>${p.descrizione}</div>'">
+                            <div class="photo-caption">${p.descrizione} (${p.chiuso || p.data})</div>
+                        </div>`;
+                });
+                carousel.innerHTML = photoHTML;
+
+                // Photo rotation
+                let currentSlide = 0;
+                setInterval(() => {
+                    const slides = carousel.querySelectorAll('.photo-slide');
+                    if (slides.length > 1) {
+                        slides[currentSlide].classList.remove('active');
+                        currentSlide = (currentSlide + 1) % slides.length;
+                        slides[currentSlide].classList.add('active');
+                    }
+                }, 6000);
+            } else {
+                carousel.innerHTML = '<div class="no-photos">Nessuna foto disponibile<br><br><span style="font-size:12px;color:#3a5a7a">Aggiungi un URL immagine nella colonna "Foto URL" del Google Sheet</span></div>';
+            }
+
+            // Ticker update
+            const tickerEl = document.getElementById('ticker');
+            let tickerHTML = '<span>Safety First — Nessun pacco vale piu della tua salute</span>';
+            tickerHTML += '<span>Hai un finding? Segnalalo al tuo ASC representative!</span>';
+            tickerHTML += `<span>Open findings: ${openItems.length} | Completed: ${closedItems.length}</span>`;
+            tickerHTML += '<span>Safety First — Nessun pacco vale piu della tua salute</span>';
+            tickerEl.innerHTML = tickerHTML;
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const text = await response.text();
+                const data = parseCSV(text);
+                renderBoard(data);
+                document.getElementById('refreshInfo').textContent = `Ultimo aggiornamento: ${new Date().toLocaleTimeString('it-IT')}`;
+            } catch (err) {
+                document.getElementById('openItems').innerHTML = `<div class="loading">Errore caricamento: ${err.message}<br>Verifica che il foglio sia condiviso pubblicamente.</div>`;
+            }
+        }
+
+        // Initial load
+        loadData();
+
+        // Auto refresh
+        setInterval(loadData, REFRESH_INTERVAL);
+    </script>
+</body>
+</html>
