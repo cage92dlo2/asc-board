@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1920, height=1080">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ASC Board - DLO2</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -10,8 +10,8 @@
             font-family: 'Segoe UI', Arial, sans-serif;
             background: #1a2332;
             color: #fff;
-            width: 1920px;
-            height: 1080px;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
         }
         .header {
@@ -39,7 +39,7 @@
         .header .date-display { font-size: 18px; color: #00a8e8; font-weight: 600; }
         .header .refresh-info { font-size: 12px; color: #5a7a9a; }
 
-        .main { display: flex; height: 950px; }
+        .main { display: flex; height: calc(100vh - 130px); }
 
         /* LEFT BOARD */
         .board-section {
