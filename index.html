@@ -56,6 +56,8 @@
             padding: 20px;
             overflow: hidden;
             border: 1px solid #2a4a6b;
+            display: flex;
+            flex-direction: column;
         }
         .open-section h2 {
             font-size: 22px;
@@ -83,7 +85,7 @@
         }
         .items-container {
             overflow: hidden;
-            max-height: calc(100% - 80px);
+            flex: 1;
             position: relative;
         }
         .items-scroll {
@@ -140,6 +142,8 @@
             padding: 20px;
             overflow: hidden;
             border: 1px solid #1a5c2a;
+            display: flex;
+            flex-direction: column;
         }
         .closed-section h2 {
             font-size: 20px;
@@ -265,12 +269,12 @@
         }
         .ticker {
             display: flex;
-            animation: ticker 30s linear infinite;
+            animation: ticker 60s linear infinite;
             white-space: nowrap;
         }
         @keyframes ticker {
             0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            100% { transform: translateX(-200%); }
         }
         .ticker span { padding: 0 50px; font-size: 14px; color: #00a8e8; }
 
@@ -296,30 +300,32 @@
     <div class="main">
         <div class="board-section">
             <div class="open-section">
-                <h2>OPEN FINDINGS <span class="count-badge" id="openCount">0</span></h2>
+                <h2>SEGNALAZIONI APERTE <span class="count-badge" id="openCount">0</span></h2>
+                <div class="item-row header-row">
+                    <span>Data</span>
+                    <span>Descrizione</span>
+                    <span>Owner</span>
+                    <span>ETA</span>
+                    <span>Status</span>
+                </div>
                 <div class="items-container">
-                    <div class="item-row header-row">
-                        <span>Data</span>
-                        <span>Descrizione</span>
-                        <span>Owner</span>
-                        <span>ETA</span>
-                        <span>Status</span>
-                    </div>
                     <div id="openItems" class="items-scroll">
                         <div class="loading">Caricamento dati...</div>
                     </div>
                 </div>
             </div>
             <div class="closed-section">
-                <h2>COMPLETED <span class="count-badge" id="closedCount">0</span></h2>
+                <h2>COMPLETATI <span class="count-badge" id="closedCount">0</span></h2>
                 <div class="closed-row header-row">
                     <span>Data</span>
                     <span>Descrizione</span>
                     <span>Owner</span>
                     <span>Chiuso il</span>
                 </div>
-                <div id="closedItems" class="closed-scroll">
-                    <div class="loading">Caricamento dati...</div>
+                <div class="items-container">
+                    <div id="closedItems" class="closed-scroll">
+                        <div class="loading">Caricamento dati...</div>
+                    </div>
                 </div>
             </div>
         </div>
